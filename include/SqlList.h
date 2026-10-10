@@ -7,6 +7,8 @@
 #define List_Init_Size 100
 #define Listcrement 10
 
+extern const char universe[27];
+
 typedef char ElemType;
 
 typedef int Status;
@@ -28,5 +30,9 @@ Status ListEmpty(SqList *L);
 Status ListLength(SqList *L);
 Status CreatList(SqList *L);
 void PrintList(SqList *L);
+Status Union(SqList La, SqList Lb, SqList *Lc);
+Status Intersection(SqList La, SqList Lb, SqList *Lc);
+Status Difference(SqList La, SqList Lb, SqList *Lc);
+Status Complement(SqList La, SqList *Lc);
 
 #endif

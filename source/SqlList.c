@@ -4,7 +4,9 @@
 #include <windows.h>
 #include "SqlList.h"
 
-Status InitList(SqList *L){
+const char universe[27] = "abcdefghijklmnopqrstuvwxyz";
+
+Status InitList(SqList *L){        //输入一个未初始化的sqlist型变量的指针
     L->elem = (ElemType*)malloc(List_Init_Size * sizeof(ElemType));
     if(!L->elem) return OVERFLOW;
     else{
@@ -25,7 +27,7 @@ Status DestroyList(SqList *L){
 Status ListInsert(SqList *L, int i, ElemType e){
     if(i<1 || i>L->length+1) return ERROR;
 
-    if(L->listsize <= L->length + 1){
+    if(L->listsize <= L->length + 1){    //数组空间不足就扩容
         if(L->listsize > MAXINT - Listcrement) return OVERFLOW;
         int newsize = L->listsize + Listcrement;
         ElemType *list = (ElemType*)realloc(L->elem,newsize * sizeof( ElemType));
@@ -45,7 +47,7 @@ Status ListInsert(SqList *L, int i, ElemType e){
 
 Status ListDelete(SqList *L, int i, ElemType *e){
     if(i<1 || i>L->length) return ERROR;
-    *e = L->elem[i-1];
+    *e = L->elem[i-1];          //把值赋给指针所指地址，从而带出
 
     for(int j=i ; j<L->length ; j++){
         L->elem[j-1] = L->elem[j];
@@ -69,7 +71,7 @@ Status GetElem(SqList *L, int i, ElemType *e){
     return OK;
 }
 
-Status ClearList(SqList *L){
+Status ClearList(SqList *L){      //不会更改数组空间
     L->length = 0;
     return OK;
 }
@@ -83,40 +85,82 @@ Status ListLength(SqList *L){
     return L->length;
 }
 
-Status CreatList(SqList *L){
-    int c;
+Status CreatList(SqList *La){
+    SqList L = {NULL, 0, 0};
+    InitList(&L);
 
-    while((c = getchar()) != EOF && c != '\n'){
+    int c;
+    while((c = getchar()) != EOF && c != '\n'){    //逐个获取stdio缓冲区的字符，缓冲区无残留
         int found1 = 0;
         int ufound2 = 1;
-        int loletr[26] = {'a','b','c','d','e','f','g','h','i','j','k','l',
-            'm','n','o','p','q','r','s','t','u','v','w','x','y','z'};
-        for(int i=0 ; i<26 ; i++){
-            if(c == loletr[i]){
-                found1 = 1;
+        
+        for(int i=0 ; i<26 ; i++){    //过滤不合法元素
+            if(c == universe[i]){
+                found1 = 1;  //是合法元素
                 break;
             }
         }
 
         if(found1){
-            for(int i=0 ; i<L->length ; i++){
-                if(c == L->elem[i]){
-                    ufound2 = 0;
+            for(int i=0 ; i<L.length ; i++){  //过滤重复元素
+                if(c == L.elem[i]){
+                    ufound2 = 0;   //未发现，为新元素
                     break;
                 }
             }
 
-            if(ufound2) ListInsert(L , L->length+1 , c);
+            if(ufound2) ListInsert(&L , L.length+1 , c);
         }
     }
-
+    
+    if(La->elem != NULL) DestroyList(La);
+    *La = L;
+    DestroyList(&L);
     return OK;
 }
 
-void PrintList(SqList *L){
-    if(L->length == 0) printf("空集\n");
-    for(int i=0 ; i<L->length ; i++){
-        printf("%c ",L->elem[i]);
+void PrintList(SqList *La){
+    if(La->length == 0) printf("空集\n");
+    for(int i=0 ; i<La->length ; i++){
+        printf("%c ",La->elem[i]);
     }
     printf("\n");
+}
+
+Status Union(SqList La, SqList Lb, SqList *Lc){
+    for(int i=0 ; i<La.length ; i++){
+        ListInsert(Lc , Lc->length+1 , La.elem[i]);
+    }
+
+    for(int i=0 ; i<Lb.length ; i++){
+        if(!LocateElem(Lc, Lb.elem[i]))
+        ListInsert(Lc , Lc->length+1 , Lb.elem[i]);
+    }
+    return OK;
+}
+
+Status Intersection(SqList La, SqList Lb, SqList *Lc){
+    for(int i=0 ; i<La.length ; i++){
+        if(LocateElem(&Lb, La.elem[i]))
+        ListInsert(Lc , Lc->length+1 , La.elem[i]);
+    }
+    return OK;
+}
+
+Status Difference(SqList La, SqList Lb, SqList *Lc){
+    for(int i=0 ; i<La.length ; i++){
+        if(!LocateElem(&Lb, La.elem[i]))
+        ListInsert(Lc , Lc->length+1 , La.elem[i]);
+    }
+    return OK;
+}
+
+Status Complement(SqList La, SqList *Lc){
+    SqList L = { NULL, 0, 0 };
+    InitList(&L);
+    memcpy(L.elem , universe , sizeof(universe));
+    L.length = 26;
+    Difference(L, La, Lc);
+    DestroyList(&L);
+    return OK;
 }
