@@ -115,15 +115,16 @@ Status CreatList(SqList *La){
     
     if(La->elem != NULL) DestroyList(La);
     *La = L;
-    DestroyList(&L);
     return OK;
 }
 
 void PrintList(SqList *La){
     if(La->length == 0) printf("空集\n");
-    for(int i=0 ; i<La->length ; i++){
-        printf("%c ",La->elem[i]);
+    printf("{");
+    for(int i=0 ; i<La->length-1 ; i++){
+        printf("%c,",La->elem[i]);
     }
+    printf("%c}",La->elem[La->length-1]);
     printf("\n");
 }
 
