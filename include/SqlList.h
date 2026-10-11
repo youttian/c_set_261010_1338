@@ -7,8 +7,6 @@
 #define List_Init_Size 100
 #define Listcrement 10
 
-extern const char universe[27];
-
 typedef char ElemType;
 
 typedef int Status;
@@ -19,7 +17,7 @@ typedef struct {
     int listsize;
 }SqList;
 
-Status InitList(SqList *L);
+SqList InitList(void);
 Status DestroyList(SqList *L);
 Status ListInsert(SqList *L, int i, ElemType e);
 Status ListDelete(SqList *L, int i, ElemType *e);
@@ -28,11 +26,5 @@ Status GetElem(SqList *L, int i, ElemType *e);
 Status ClearList(SqList *L);
 Status ListEmpty(SqList *L);
 Status ListLength(SqList *L);
-Status CreatList(SqList *L);
-void PrintList(SqList *L);
-Status Union(SqList La, SqList Lb, SqList *Lc);
-Status Intersection(SqList La, SqList Lb, SqList *Lc);
-Status Difference(SqList La, SqList Lb, SqList *Lc);
-Status Complement(SqList La, SqList *Lc);
 
 #endif
